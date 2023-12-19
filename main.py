@@ -50,15 +50,16 @@ class Waiter():
         
 
 class Cooker():
-    def __init__(self):
+    def __init__(self, cooker_no, customer_no):
         super().__init__() 
+        self.cooker_no = cooker_no
+        self.customer_no = customer_no
     
     def siparis_hazirla(self):
-        print("Sipariş hazırlanıyor")
+        print("{self.cooker_no} no'lu aşçı {self.customer_no} no'lu müşterinin siparişini hazırlıyor")
     
     def siparis_hazir(self):
-        print("Sipariş hazırlandı")
-
+        print("{self.cooker_no} no'lu aşçı {self.customer_no} no'lu müşterinin siparişini hazırladı")
 
 
 class LoginPanel(QWidget):
