@@ -3,6 +3,8 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QSpinBox, QPushButton
 import sys
 import threading
+import time
+ 
 
 adimSayisi = 0
 normalQueue = []
@@ -11,24 +13,25 @@ inQueue = []
 musteriQueue = []
 
 class Customer():
-    def __init__(self, masa):
+    def __init__(self, customer_no, table_no):
         super().__init__()
-        self.masa = masa
+        self.customer_no = customer_no
+        self.table_no = table_no
         
-    def sit_at_table(self, table):
-        print(f"Müşteri masaya oturdu")
+    def sit_at_table(self):
+        print(f"{self.customer_no} no'lu müşteri {self.table_no} masaya oturdu")
         
     def to_order(self):
-        print("Müşteri sipariş verdi")
+        print(f"{self.customer_no} no'lu müşteri sipariş verdi")
     
     def take_order(self):
-        print("Müşteri siparişini aldı")
+        print(f"{self.customer_no} müşteri siparişini aldı")
     
     def pay(self):
-        print("Müşteri hesabı ödedi")
+        print("{self.customer_no} no'lu müşteri hesabı ödedi")
     
     def leave(self):
-        print("Müşteri restorandan ayrıldı")
+        print("{self.customer_no} no'lu müşteri restorandan ayrıldı")
     
 
 
