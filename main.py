@@ -12,6 +12,7 @@ musteriQueue = []
 
 class Customer():
     def __init__(self, masa):
+        super().__init__()
         self.masa = masa
         
     def sit_at_table(self, table):
@@ -20,7 +21,42 @@ class Customer():
     def to_order(self):
         print("Müşteri sipariş verdi")
     
+    def take_order(self):
+        print("Müşteri siparişini aldı")
     
+    def pay(self):
+        print("Müşteri hesabı ödedi")
+    
+    def leave(self):
+        print("Müşteri restorandan ayrıldı")
+    
+
+
+class Waiter():
+    def __init__(self):
+        super().__init__() 
+    
+    def siparis_al():
+        print("Müşteriden sipariş alındı")
+    
+    def mutfaga_ilet():
+        print("Sipaiş mutfağa iletildi")
+    
+    def siparis_teslim():
+        print("Sipariş teslim edildi")
+        
+
+class Cooker():
+    def __init__(self):
+        super().__init__() 
+    
+    def siparis_hazirla(self):
+        print("Sipariş hazırlanıyor")
+    
+    def siparis_hazir(self):
+        print("Sipariş hazırlandı")
+
+
 
 class LoginPanel(QWidget):
     def __init__(self):
