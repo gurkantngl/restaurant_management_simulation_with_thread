@@ -36,30 +36,33 @@ class Customer():
 
 
 class Waiter():
-    def __init__(self):
-        super().__init__() 
+    def __init__(self, waiter_no, table_no):
+        super().__init__()
+        self.waiter_no = waiter_no
+        self.table_no = table_no
     
     def siparis_al():
-        print("Müşteriden sipariş alındı")
+        print("{self.waiter_no} no'lu garson {self.table_no} no'lu masadan sipariş aldı")
     
     def mutfaga_ilet():
-        print("Sipaiş mutfağa iletildi")
+        print("{self.waiter_no} no'lu garson {self.table_no} no'lu masanın siparişini mutfağa iletti")
     
     def siparis_teslim():
-        print("Sipariş teslim edildi")
+        print("{self.waiter_no} no'lu garson {self.table_no} no'lu masanın siparişini teslim etti")
         
 
 class Cooker():
-    def __init__(self, cooker_no, customer_no):
+    def __init__(self, cooker_no, table_no):
         super().__init__() 
         self.cooker_no = cooker_no
-        self.customer_no = customer_no
+        self.table_no = table_no
     
     def siparis_hazirla(self):
-        print("{self.cooker_no} no'lu aşçı {self.customer_no} no'lu müşterinin siparişini hazırlıyor")
+        print("{self.cooker_no} no'lu aşçı {self.table_no} no'lu müşterinin siparişini hazırlıyor")
     
     def siparis_hazir(self):
-        print("{self.cooker_no} no'lu aşçı {self.customer_no} no'lu müşterinin siparişini hazırladı")
+        print("{self.cooker_no} no'lu aşçı {self.table_no} no'lu müşterinin siparişini hazırladı")
+
 
 
 class LoginPanel(QWidget):
