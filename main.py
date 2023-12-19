@@ -2,8 +2,25 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QSpinBox, QPushButton
 import sys
+import threading
 
 adimSayisi = 0
+normalQueue = []
+oncelikliQueue = []
+inQueue = []
+musteriQueue = []
+
+class Customer():
+    def __init__(self, masa):
+        self.masa = masa
+        
+    def sit_at_table(self, table):
+        print(f"Müşteri masaya oturdu")
+        
+    def to_order(self):
+        print("Müşteri sipariş verdi")
+    
+    
 
 class LoginPanel(QWidget):
     def __init__(self):
@@ -198,7 +215,9 @@ class Prb1Panel(QWidget):
             self.spnOncelik.setFont(font)
             self.spnOncelik.setVisible(True)
             self.oncelikSpnList.append(self.spnOncelik)
-            
+        
+        
+        
         self.pushButton = QPushButton(self)
         self.pushButton.setText("Simülasyonu Başlat")
         self.pushButton.setFont(font)
@@ -214,10 +233,71 @@ class Prb1Panel(QWidget):
     
     def btn2(self):
         global adimSayisi
+        global inQueue
+        global oncelikliQueue
+        global normalQueue
         
         self.lblNormal.close()
         self.lblOncelik.close()
         self.pushButton.close()
+        
+        # Döngü adım sayısı kadar döner
+        for i in range(int(adimSayisi)):
+            value1 = self.oncelikSpnList[i].value()  
+            value2 = self.normalSpnList[i].value()
+            
+            # o adımdaki öncelikli müşterilerin thread ini tutacak bir list tanımlanır
+            l = []
+            # o adımdaki öncelikli müşteri sayısı kadar döngü döner
+            for _ in range(value1):
+                # her müşteri için thread açılır
+                t = threading.Thread(target=musteri, args=())
+                l.append(t)
+            # tüm öncelikli müşterileri tutan list e adımdaki liste eklenir
+            oncelikliQueue.append(l)
+            
+            # adımdaki normal müşterileri tutan list tanımlanır
+            l = []
+            # adımdaki normal müşteri sayısı kadar döngü döner
+            for _ in range(value2):
+                # her müşteri için thread oluşturulur
+                t = threading.Thread(target=musteri, args=())
+                l.append(t)
+            # tüm normal müşterileri tutan list e  adımdaki list eklenir
+            normalQueue.append(l)
+        
+        kalan = 6
+        
+        for i in range(int(adimSayisi)):
+            num1 = len(oncelikliQueue[i])
+            if num1 >= kalan:
+                inQueue += oncelikliQueue[i][:kalan]
+                oncelikliQueue[i] = oncelikliQueue[i][kalan:]
+            else:
+                inQueue += oncelikliQueue[i]
+                oncelikliQueue[i] = []
+                
+            kalan -= num1
+            num2 = len(normalQueue[i])
+            if num2 >= kalan:
+                inQueue += normalQueue[i][:kalan]
+                normalQueue[i] = normalQueue[i][kalan:]
+            else:
+                inQueue += normalQueue[i]
+                normalQueue[i] = []
+                
+            kalan -= num2
+            if kalan <= 0:
+                break
+        
+        normalQueue = list(filter(lambda x: x != [], normalQueue))
+        oncelikliQueue = list(filter(lambda x: x != [], normalQueue))
+
+        
+        print("inQueue: ", inQueue)
+        print("normalQueue: ", normalQueue)
+        print("oncelikliQueue: ", oncelikliQueue)
+        
         
         for lbl in self.lblList:
             lbl.close()
@@ -240,45 +320,105 @@ class Prb1Panel(QWidget):
         self.lblMasa.setVisible(True)
         
         
-        pixmapBos = QtGui.QPixmap('img/bos-masa.jpg')
-        pixmapDolu = QtGui.QPixmap('img/dolu-masa.jpg')
+        pixmapBos = QtGui.QPixmap('img/bos.jpg')
+        pixmapDolu = QtGui.QPixmap('img/dolu.jpg')
         
         self.masa1 = QtWidgets.QLabel(self)
-        self.masa1.setPixmap(pixmapBos)
+        self.masa1.setPixmap(pixmapDolu)
         self.masa1.setGeometry(50, 50, 40, 40)
         self.masa1.setVisible(True)
         self.masa1.setScaledContents(True)
         
         self.masa2 = QtWidgets.QLabel(self)
-        self.masa2.setPixmap(pixmapBos)
+        self.masa2.setPixmap(pixmapDolu)
         self.masa2.setGeometry(120, 50, 40, 40)
         self.masa2.setVisible(True)
         self.masa2.setScaledContents(True)
         
         self.masa3 = QtWidgets.QLabel(self)
-        self.masa3.setPixmap(pixmapBos)
+        self.masa3.setPixmap(pixmapDolu)
         self.masa3.setGeometry(190, 50, 40, 40)
         self.masa3.setVisible(True)
         self.masa3.setScaledContents(True)
         
         self.masa4 = QtWidgets.QLabel(self)
-        self.masa4.setPixmap(pixmapBos)
+        self.masa4.setPixmap(pixmapDolu)
         self.masa4.setGeometry(50, 120, 40, 40)
         self.masa4.setVisible(True)
         self.masa4.setScaledContents(True)
         
         self.masa5 = QtWidgets.QLabel(self)
-        self.masa5.setPixmap(pixmapBos)
+        self.masa5.setPixmap(pixmapDolu)
         self.masa5.setGeometry(120, 120, 40, 40)
         self.masa5.setVisible(True)
         self.masa5.setScaledContents(True)
         
         self.masa6 = QtWidgets.QLabel(self)
-        self.masa6.setPixmap(pixmapBos)
+        self.masa6.setPixmap(pixmapDolu)
         self.masa6.setGeometry(190, 120, 40, 40)
         self.masa6.setVisible(True)
         self.masa6.setScaledContents(True)
         
+        
+        
+        
+        
+        self.lblGarson = QLabel("Garsonlar", self)
+        self.lblGarson.move(320, 10)
+        self.lblGarson.setFont(font)
+        self.lblGarson.setVisible(True)
+          
+        self.garson1 = QtWidgets.QLabel(self)
+        self.garson1.setPixmap(pixmapBos)
+        self.garson1.setGeometry(300, 50, 20, 40)
+        self.garson1.setVisible(True)
+        self.garson1.setScaledContents(True)
+        
+        self.garson2 = QtWidgets.QLabel(self)
+        self.garson2.setPixmap(pixmapBos)
+        self.garson2.setGeometry(350, 50, 20, 40)
+        self.garson2.setVisible(True)
+        self.garson2.setScaledContents(True)
+        
+        self.garson3 = QtWidgets.QLabel(self)
+        self.garson3.setPixmap(pixmapBos)
+        self.garson3.setGeometry(400, 50, 20, 40)
+        self.garson3.setVisible(True)
+        self.garson3.setScaledContents(True)
+        
+        
+        
+        
+        self.lblAsci = QLabel("Aşçılar", self)
+        self.lblAsci.move(510, 10)
+        self.lblAsci.setFont(font)
+        self.lblAsci.setVisible(True)
+        
+        
+        self.asci1 = QtWidgets.QLabel(self)
+        self.asci1.setPixmap(pixmapBos)
+        self.asci1.setGeometry(500, 50, 20, 40)
+        self.asci1.setVisible(True)
+        self.asci1.setScaledContents(True)
+        
+        self.asci2 = QtWidgets.QLabel(self)
+        self.asci2.setPixmap(pixmapBos)
+        self.asci2.setGeometry(550, 50, 20, 40)
+        self.asci2.setVisible(True)
+        self.asci2.setScaledContents(True)
+        
+    
+    
+        self.lblKasa = QLabel("Kasa", self)
+        self.lblKasa.move(660, 10)
+        self.lblKasa.setFont(font)
+        self.lblKasa.setVisible(True)
+        
+        self.kasa = QtWidgets.QLabel(self)
+        self.kasa.setPixmap(pixmapBos)
+        self.kasa.setGeometry(650, 50, 60, 60)
+        self.kasa.setVisible(True)
+        self.kasa.setScaledContents(True)
         
         self.setFixedSize(1280, 720)
         self.backgroundLabel.setGeometry(0, 0, self.width(), self.height())
@@ -297,7 +437,8 @@ class Prb2Panel(QWidget):
         pass
 
  
-
+def musteri():
+    pass
 
         
 
