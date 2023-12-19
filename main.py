@@ -65,6 +65,17 @@ class Cooker():
 
 
 
+class kasa():
+    def __init__(self):
+        self.lock = threading.Lock()
+        
+    def odeme(self, customer_no):
+        with self.lock:
+            print(f"{customer_no} no'lu müşterinin ödemesi alındı")
+        
+
+
+
 class LoginPanel(QWidget):
     def __init__(self):
         super().__init__()
