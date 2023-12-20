@@ -4,22 +4,33 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QSpinBox, 
 import sys
 import threading
 import time
- 
+
 
 adimSayisi = 0
 normalQueue = []
 oncelikliQueue = []
 inQueue = []
 musteriQueue = []
+availableTables = [1, 2, 3, 4, 5, 6]
+customerCounter = 1
+masaList = []
+value1List = []
+value2List = []
+pixmapBos = int()
+pixmapDolu = int()
 
 class Customer():
-    def __init__(self, customer_no, table_no):
+    def __init__(self, customer_no, table_no, table, pixmapBos, pixmapDolu):
         super().__init__()
         self.customer_no = customer_no
         self.table_no = table_no
+        self.table = table
+        self.pixmapBos = pixmapBos
+        self.pixmapDolu = pixmapDolu
         
     def sit_at_table(self):
         print(f"{self.customer_no} no'lu müşteri {self.table_no} masaya oturdu")
+        self.table.setPixmap(self.pixmapDolu)
         
     def to_order(self):
         print(f"{self.customer_no} no'lu müşteri sipariş verdi")
@@ -290,77 +301,20 @@ class Prb1Panel(QWidget):
         global inQueue
         global oncelikliQueue
         global normalQueue
+        global customerCounter
+        global value1List
+        global value2List
+        global pixmapDolu
+        global pixmapBos
         
         self.lblNormal.close()
         self.lblOncelik.close()
         self.pushButton.close()
         
-        # Döngü adım sayısı kadar döner
-        for i in range(int(adimSayisi)):
-            value1 = self.oncelikSpnList[i].value()  
-            value2 = self.normalSpnList[i].value()
-            
-            # o adımdaki öncelikli müşterilerin thread ini tutacak bir list tanımlanır
-            l = []
-            # o adımdaki öncelikli müşteri sayısı kadar döngü döner
-            for _ in range(value1):
-                # her müşteri için thread açılır
-                t = threading.Thread(target=musteri, args=())
-                l.append(t)
-            # tüm öncelikli müşterileri tutan list e adımdaki liste eklenir
-            oncelikliQueue.append(l)
-            
-            # adımdaki normal müşterileri tutan list tanımlanır
-            l = []
-            # adımdaki normal müşteri sayısı kadar döngü döner
-            for _ in range(value2):
-                # her müşteri için thread oluşturulur
-                t = threading.Thread(target=musteri, args=())
-                l.append(t)
-            # tüm normal müşterileri tutan list e  adımdaki list eklenir
-            normalQueue.append(l)
-        
-        kalan = 6
         
         for i in range(int(adimSayisi)):
-            num1 = len(oncelikliQueue[i])
-            if num1 >= kalan:
-                inQueue += oncelikliQueue[i][:kalan]
-                oncelikliQueue[i] = oncelikliQueue[i][kalan:]
-            else:
-                inQueue += oncelikliQueue[i]
-                oncelikliQueue[i] = []
-                
-            kalan -= num1
-            num2 = len(normalQueue[i])
-            if num2 >= kalan:
-                inQueue += normalQueue[i][:kalan]
-                normalQueue[i] = normalQueue[i][kalan:]
-            else:
-                inQueue += normalQueue[i]
-                normalQueue[i] = []
-                
-            kalan -= num2
-            if kalan <= 0:
-                break
-        
-        normalQueue = list(filter(lambda x: x != [], normalQueue))
-        oncelikliQueue = list(filter(lambda x: x != [], normalQueue))
-
-        
-        print("inQueue: ", inQueue)
-        print("normalQueue: ", normalQueue)
-        print("oncelikliQueue: ", oncelikliQueue)
-        
-        
-        for lbl in self.lblList:
-            lbl.close()
-        
-        for normal in self.normalSpnList:
-            normal.close()
-        
-        for oncelik in self.oncelikSpnList:
-            oncelik.close()
+            value1List.append(self.oncelikSpnList[i].value())  
+            value2List.append(self.normalSpnList[i].value())
         
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -378,43 +332,46 @@ class Prb1Panel(QWidget):
         pixmapDolu = QtGui.QPixmap('img/dolu.jpg')
         
         self.masa1 = QtWidgets.QLabel(self)
-        self.masa1.setPixmap(pixmapDolu)
+        self.masa1.setPixmap(pixmapBos)
         self.masa1.setGeometry(50, 50, 40, 40)
         self.masa1.setVisible(True)
         self.masa1.setScaledContents(True)
+        masaList.append(self.masa1)
         
         self.masa2 = QtWidgets.QLabel(self)
-        self.masa2.setPixmap(pixmapDolu)
+        self.masa2.setPixmap(pixmapBos)
         self.masa2.setGeometry(120, 50, 40, 40)
         self.masa2.setVisible(True)
         self.masa2.setScaledContents(True)
-        
+        masaList.append(self.masa2)
+                
         self.masa3 = QtWidgets.QLabel(self)
-        self.masa3.setPixmap(pixmapDolu)
+        self.masa3.setPixmap(pixmapBos)
         self.masa3.setGeometry(190, 50, 40, 40)
         self.masa3.setVisible(True)
         self.masa3.setScaledContents(True)
+        masaList.append(self.masa3)
         
         self.masa4 = QtWidgets.QLabel(self)
-        self.masa4.setPixmap(pixmapDolu)
+        self.masa4.setPixmap(pixmapBos)
         self.masa4.setGeometry(50, 120, 40, 40)
         self.masa4.setVisible(True)
         self.masa4.setScaledContents(True)
+        masaList.append(self.masa4)
         
         self.masa5 = QtWidgets.QLabel(self)
-        self.masa5.setPixmap(pixmapDolu)
+        self.masa5.setPixmap(pixmapBos)
         self.masa5.setGeometry(120, 120, 40, 40)
         self.masa5.setVisible(True)
         self.masa5.setScaledContents(True)
+        masaList.append(self.masa5)
         
         self.masa6 = QtWidgets.QLabel(self)
-        self.masa6.setPixmap(pixmapDolu)
+        self.masa6.setPixmap(pixmapBos)
         self.masa6.setGeometry(190, 120, 40, 40)
         self.masa6.setVisible(True)
         self.masa6.setScaledContents(True)
-        
-        
-        
+        masaList.append(self.masa6)
         
         
         self.lblGarson = QLabel("Garsonlar", self)
@@ -439,7 +396,6 @@ class Prb1Panel(QWidget):
         self.garson3.setGeometry(400, 50, 20, 40)
         self.garson3.setVisible(True)
         self.garson3.setScaledContents(True)
-        
         
         
         
@@ -474,9 +430,23 @@ class Prb1Panel(QWidget):
         self.kasa.setVisible(True)
         self.kasa.setScaledContents(True)
         
+        
+        
+        for lbl in self.lblList:
+            lbl.close()
+        
+        for normal in self.normalSpnList:
+            normal.close()
+        
+        for oncelik in self.oncelikSpnList:
+            oncelik.close()
+        
+        
+        
         self.setFixedSize(1280, 720)
         self.backgroundLabel.setGeometry(0, 0, self.width(), self.height())
-    
+        t = threading.Thread(target=run, args=())
+        t.start()
     
 
 class Prb2Panel(QWidget):
@@ -491,10 +461,116 @@ class Prb2Panel(QWidget):
         pass
 
  
-def musteri():
-    pass
-
+def run():
+    global value1List
+    global value2List
+    global pixmapBos
+    global pixmapDolu
+    global customerCounter
+    global normalQueue
+    global oncelikliQueue
+    global inQueue
+    global availableTables
+    
+    # Toplam müşteri sayısı hesaplanıyor
+    total = 0
+    totalOncelik = 0
+    
+    # value1List öncelikli müşteriler 
+    for value in value1List:
+        total += value
+        totalOncelik += value
+    # value2List normal müşteriler
+    for value in value2List:
+        total += value
         
+    print(f"Toplam {total} müşteri geldi. {totalOncelik} öncelikli")
+    time.sleep(0.5)
+    
+    # Döngü adım sayısı kadar döner
+    for i in range(int(adimSayisi)):
+        value1 = value1List[i]
+        value2 = value2List[i]
+        
+        # o adımdaki öncelikli müşterilerin thread ini tutacak bir list tanımlanır
+        l = []
+        # o adımdaki öncelikli müşteri sayısı kadar döngü döner
+        for _ in range(value1):
+            # her müşteri için thread açılır
+            customer = Customer(customer_no=customerCounter, table_no=availableTables[0], table=masaList[availableTables[0]-1], pixmapBos=pixmapBos, pixmapDolu=pixmapDolu)
+            availableTables.pop(0)
+            if len(availableTables) == 0:
+                availableTables = [1, 2, 3, 4, 5, 6]
+            customerCounter += 1
+            l.append(customer)
+        # tüm öncelikli müşterileri tutan list e adımdaki liste eklenir
+        oncelikliQueue.append(l)
+        
+        
+        # adımdaki normal müşterileri tutan list tanımlanır
+        l = []
+        # adımdaki normal müşteri sayısı kadar döngü döner
+        for _ in range(value2):
+            # her müşteri için thread oluşturulur
+            customer = Customer(customer_no=customerCounter, table_no=availableTables[0], table=masaList[availableTables[0]-1], pixmapBos=pixmapBos, pixmapDolu=pixmapDolu)
+            availableTables.pop(0)
+            if len(availableTables) == 0:
+                availableTables = [1, 2, 3, 4, 5, 6]
+            customerCounter += 1
+            l.append(customer)
+        # tüm normal müşterileri tutan list e  adımdaki list eklenir
+        normalQueue.append(l)
+    
+    kalan = 6
+    
+    for i in range(int(adimSayisi)):
+        num1 = len(oncelikliQueue[i])
+        if num1 >= kalan:
+            inQueue += oncelikliQueue[i][:kalan]
+            oncelikliQueue[i] = oncelikliQueue[i][kalan:]
+        else:
+            inQueue += oncelikliQueue[i]
+            oncelikliQueue[i] = []
+            
+        kalan -= num1
+        num2 = len(normalQueue[i])
+        if num2 >= kalan:
+            inQueue += normalQueue[i][:kalan]
+            normalQueue[i] = normalQueue[i][kalan:]
+        else:
+            inQueue += normalQueue[i]
+            normalQueue[i] = []
+            
+        kalan -= num2
+        if kalan <= 0:
+            break
+    
+    normalQueue = list(filter(lambda x: x != [], normalQueue))
+    oncelikliQueue = list(filter(lambda x: x != [], oncelikliQueue))
+    
+    totalNormal = 0
+    totalOncelikli = 0
+    
+    for normal in normalQueue:
+        totalNormal += len(normal)
+    for oncelik in oncelikliQueue:
+        totalOncelikli += len(oncelik)
+    
+    for customer in inQueue:
+        t = threading.Thread(target=customer.sit_at_table, args=())
+        t.start()
+        t.join()
+        time.sleep(0.5)
+    print(f"{totalNormal + totalOncelikli} müşteri beklemede. {totalOncelikli} öncelikli")
+
+    waitQueue = oncelikliQueue
+    waitQueue += normalQueue
+    
+    while len(inQueue) != 0:
+        for customer in inQueue:
+            pass
+    
+    
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
