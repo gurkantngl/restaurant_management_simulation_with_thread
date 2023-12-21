@@ -1,9 +1,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QSpinBox, QPushButton
+from PyQt5.QtGui import QPixmap, QFont
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QSpinBox, QPushButton, QTableWidget, QTableWidgetItem
 import sys
 import threading
 import time
+import random
+
 
 
 adimSayisi = 0
@@ -18,6 +20,9 @@ value1List = []
 value2List = []
 pixmapBos = int()
 pixmapDolu = int()
+waiterList = []
+cookerList = []
+
 
 class Customer():
     def __init__(self, customer_no, table_no, table, pixmapBos, pixmapDolu):
@@ -29,61 +34,103 @@ class Customer():
         self.pixmapDolu = pixmapDolu
         
     def sit_at_table(self):
-        print(f"{self.customer_no} no'lu müşteri {self.table_no} masaya oturdu")
-        self.table.setPixmap(self.pixmapDolu)
+        text = f"{self.customer_no} no'lu müşteri {self.table_no} masaya oturdu"
+        print(text)
+        
+        Prb1Panel.addCustomerTable(text)
         
     def to_order(self):
-        print(f"{self.customer_no} no'lu müşteri sipariş verdi")
-    
+        global waiterList
+        
+        text = f"{self.customer_no} no'lu müşteri garson çağırdı"
+        print(text)
+        Prb1Panel.addCustomerTable(text)
+        time.sleep(0.2)
+        
     def take_order(self):
-        print(f"{self.customer_no} müşteri siparişini aldı")
-    
+        text = f"{self.customer_no} müşteri siparişini aldı"
+        print(text)
+        Prb1Panel.addCustomerTable(text)
+            
     def pay(self):
-        print("{self.customer_no} no'lu müşteri hesabı ödedi")
+        text = f"{self.customer_no} no'lu müşteri hesabı ödedi"
+        print(text)
+        Prb1Panel.addCustomerTable(text)
     
     def leave(self):
-        print("{self.customer_no} no'lu müşteri restorandan ayrıldı")
+        text = f"{self.customer_no} no'lu müşteri restorandan ayrıldı"
+        print(text)
+        Prb1Panel.addCustomerTable(text)
     
 
 
 class Waiter():
-    def __init__(self, waiter_no, table_no):
+    def __init__(self, waiter_no):
         super().__init__()
         self.waiter_no = waiter_no
-        self.table_no = table_no
+        self.table_no = 0
+        self.lock = threading.Semaphore()
+        self.cookerL = [0, 1]
+        
+    def siparis_al(self, customer_no):
+        self.lock.acquire()
+        try:
+            print(f"{self.waiter_no} no'lu garson {customer_no} no'lu müşterinin siparişini alıyor\n") 
+            time.sleep(2)
+            print(f"{self.waiter_no} no'lu garson {customer_no} no'lu müşterinin siparişini aldı\n")
+            self.mutfaga_ilet(customer_no)
+        finally:
+            self.lock.release()
+            
+    def mutfaga_ilet(self, customer_no):
+        global cookerList
+        
+        
+        print(f"{self.waiter_no} no'lu garson {customer_no} no'lu müşterinin siparişini mutfağa iletti\n")
+
+        cooker = cookerList[self.cookerL[0]]
+        self.cookerL.pop(0)
+        if len(self.cookerL) == 0:
+            self.cookerL = [0, 1]
+        cooker.siparis_hazirla(customer_no)
     
-    def siparis_al():
-        print("{self.waiter_no} no'lu garson {self.table_no} no'lu masadan sipariş aldı")
-    
-    def mutfaga_ilet():
-        print("{self.waiter_no} no'lu garson {self.table_no} no'lu masanın siparişini mutfağa iletti")
-    
-    def siparis_teslim():
-        print("{self.waiter_no} no'lu garson {self.table_no} no'lu masanın siparişini teslim etti")
+    def siparis_teslim(self):
+        print(f"{self.waiter_no} no'lu garson {self.table_no} no'lu masanın siparişini teslim etti\n")
         
 
 class Cooker():
-    def __init__(self, cooker_no, table_no):
+    def __init__(self, cooker_no):
         super().__init__() 
         self.cooker_no = cooker_no
-        self.table_no = table_no
-    
-    def siparis_hazirla(self):
-        print("{self.cooker_no} no'lu aşçı {self.table_no} no'lu müşterinin siparişini hazırlıyor")
-    
-    def siparis_hazir(self):
-        print("{self.cooker_no} no'lu aşçı {self.table_no} no'lu müşterinin siparişini hazırladı")
+        self.table_no = 0
+        self.semaphore = threading.Semaphore(2)
+        
+    def siparis_hazirla(self, customer_no):
+        self.semaphore.acquire()
+        try:
+            print(f"{self.cooker_no} no'lu aşçı {customer_no} no'lu müşterinin siparişini hazırlıyor\n")
+            time.sleep(3)
+            self.siparis_hazir(customer_no)
+        finally:
+            self.semaphore.release()
+        
+        
+    def siparis_hazir(self, customer_no):
+        print(f"{self.cooker_no} no'lu aşçı {customer_no} no'lu müşterinin siparişini hazırladı\n")
 
 
 
 class kasa():
     def __init__(self):
-        self.lock = threading.Lock()
+        self.semaphore = threading.Semaphore()
         
     def odeme(self, customer_no):
-        with self.lock:
+        self.semaphore.acquire()
+        try:
             print(f"{customer_no} no'lu müşterinin ödemesi alındı")
-        
+        finally:
+            self.semaphore.release()
+
 
 
 
@@ -181,6 +228,19 @@ class Prb1Panel(QWidget):
         self.move(220, 80)
         self.setFixedSize(700, 500)
         self.initUI()
+        
+        font = QFont()
+        font.setBold(True)
+        
+        # Tablo tanımları
+        Prb1Panel.customerTable = QTableWidget(self)
+        Prb1Panel.customerTable.setColumnCount(1)
+        Prb1Panel.customerTable.move(20, 200)
+        Prb1Panel.customerTable.setFixedSize(400,300)
+        Prb1Panel.customerTable.setVisible(False)
+        Prb1Panel.customerTable.setHorizontalHeaderLabels(["Müşteri"])
+        Prb1Panel.customerTable.horizontalHeader().setFont(font)
+        Prb1Panel.customerTable.setColumnWidth(0, 400)
 
     def initUI(self):
         self.normalSpnList = []
@@ -192,7 +252,9 @@ class Prb1Panel(QWidget):
         self.backgroundLabel.setPixmap(pixmap)
         self.backgroundLabel.setGeometry(0, 0, self.width(), self.height())
         self.backgroundLabel.setScaledContents(True)
-
+        
+        
+        
         # Adım sayısı giriniz QLabel
         self.label = QtWidgets.QLabel(self)
         self.label.setGeometry(QtCore.QRect(250, 80, 170, 70))
@@ -306,10 +368,46 @@ class Prb1Panel(QWidget):
         global value2List
         global pixmapDolu
         global pixmapBos
+        global waiterList
+        global cookerList
         
         self.lblNormal.close()
         self.lblOncelik.close()
         self.pushButton.close()
+        
+        font = QFont()
+        font.setBold(True)
+        
+        
+        Prb1Panel.customerTable.setVisible(True)
+        
+        self.waiterTable = QTableWidget(self)
+        self.waiterTable.setColumnCount(1)
+        self.waiterTable.move(450, 200)
+        self.waiterTable.setFixedSize(400,300)
+        self.waiterTable.setVisible(True)
+        self.waiterTable.setHorizontalHeaderLabels(["Garson"])
+        self.waiterTable.horizontalHeader().setFont(font)
+        self.waiterTable.setColumnWidth(0, 400)
+        
+
+        self.cookerTable = QTableWidget(self)
+        self.cookerTable.setColumnCount(1)
+        self.cookerTable.move(880, 200)
+        self.cookerTable.setFixedSize(400,300)
+        self.cookerTable.setVisible(True)
+        self.cookerTable.setHorizontalHeaderLabels(["Aşçı"])
+        self.cookerTable.horizontalHeader().setFont(font)
+        self.cookerTable.setColumnWidth(0, 400)
+        
+        self.kasaTable = QTableWidget(self)
+        self.kasaTable.setColumnCount(1)
+        self.kasaTable.move(1310, 200)
+        self.kasaTable.setFixedSize(400,300)
+        self.kasaTable.setVisible(True)
+        self.kasaTable.setHorizontalHeaderLabels(["Kasa"])
+        self.kasaTable.horizontalHeader().setFont(font)
+        self.kasaTable.setColumnWidth(0, 400)
         
         
         for i in range(int(adimSayisi)):
@@ -384,18 +482,24 @@ class Prb1Panel(QWidget):
         self.garson1.setGeometry(300, 50, 20, 40)
         self.garson1.setVisible(True)
         self.garson1.setScaledContents(True)
+        garson = Waiter(1)
+        waiterList.append(garson)
         
         self.garson2 = QtWidgets.QLabel(self)
         self.garson2.setPixmap(pixmapBos)
         self.garson2.setGeometry(350, 50, 20, 40)
         self.garson2.setVisible(True)
         self.garson2.setScaledContents(True)
+        garson = Waiter(2)
+        waiterList.append(garson)
         
         self.garson3 = QtWidgets.QLabel(self)
         self.garson3.setPixmap(pixmapBos)
         self.garson3.setGeometry(400, 50, 20, 40)
         self.garson3.setVisible(True)
         self.garson3.setScaledContents(True)
+        garson = Waiter(3)
+        waiterList.append(garson)
         
         
         
@@ -410,14 +514,16 @@ class Prb1Panel(QWidget):
         self.asci1.setGeometry(500, 50, 20, 40)
         self.asci1.setVisible(True)
         self.asci1.setScaledContents(True)
+        asci = Cooker(1)
+        cookerList.append(asci)
         
         self.asci2 = QtWidgets.QLabel(self)
         self.asci2.setPixmap(pixmapBos)
         self.asci2.setGeometry(550, 50, 20, 40)
         self.asci2.setVisible(True)
         self.asci2.setScaledContents(True)
-        
-    
+        asci = Cooker(2)
+        cookerList.append(asci)
     
         self.lblKasa = QLabel("Kasa", self)
         self.lblKasa.move(660, 10)
@@ -443,11 +549,41 @@ class Prb1Panel(QWidget):
         
         
         
-        self.setFixedSize(1280, 720)
+        self.setFixedSize(1750, 800)
         self.backgroundLabel.setGeometry(0, 0, self.width(), self.height())
         t = threading.Thread(target=run, args=())
         t.start()
     
+    
+    def addCustomerTable(text):
+        currRowNum = Prb1Panel.customerTable.rowCount()
+        Prb1Panel.customerTable.setRowCount(currRowNum + 1)
+        
+        item = QTableWidgetItem(text)
+        Prb1Panel.customerTable.setItem(currRowNum, 0, item)
+    
+    def addWaiterTable(self, text):
+        currRowNum = self.waiterTable.rowCount()
+        self.waiterTable.setRowCount(currRowNum + 1)
+        
+        item = QTableWidgetItem(text)
+        self.waiterTable.setItem(currRowNum, 0, item)
+    
+    def addCookerTable(self, text):
+        currRowNum = self.cookerTable.rowCount()
+        self.cookerTable.setRowCount(currRowNum + 1)
+        
+        item = QTableWidgetItem(text)
+        self.cookerTable.setItem(currRowNum, 0, item)
+    
+    def addKasaTable(self, text):
+        currRowNum = self.kasaTable.rowCount()
+        self.kasaTable.setRowCount(currRowNum + 1)
+        
+        item = QTableWidgetItem(text)
+        self.kasaTable.setItem(currRowNum, 0, item)
+
+
 
 class Prb2Panel(QWidget):
     def __init__(self):
@@ -562,13 +698,30 @@ def run():
         t.join()
         time.sleep(0.5)
     print(f"{totalNormal + totalOncelikli} müşteri beklemede. {totalOncelikli} öncelikli")
+    print("=========================================================")
 
+    
     waitQueue = oncelikliQueue
     waitQueue += normalQueue
     
-    while len(inQueue) != 0:
-        for customer in inQueue:
-            pass
+    #while len(inQueue) != 0:
+    # Garson Çağırma
+    for customer in inQueue:
+            t = threading.Thread(target=customer.to_order, args=())
+            t.start()
+            t.join()
+            
+    waiterL = [0, 1, 2]
+    for customer in inQueue:
+        waiter = waiterList[waiterL[0]]
+        waiterL.pop(0)
+        if len(waiterL) == 0:
+            waiterL = [0, 1, 2]
+        time.sleep(1)
+                            
+        t_siparis = threading.Thread(target=waiter.siparis_al, args=(customer.table_no,))
+        t_siparis.start()
+    
     
     
 
