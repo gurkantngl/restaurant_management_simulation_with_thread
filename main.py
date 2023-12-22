@@ -27,16 +27,17 @@ waiterL = [0, 1, 2]
 
 
 class Customer():
-    def __init__(self, customer_no, table, pixmapBos, pixmapDolu):
+    def __init__(self, customer_no, table_no, table, pixmapBos, pixmapDolu, age):
         super().__init__()
         self.customer_no = customer_no
         self.table = table
         self.pixmapBos = pixmapBos
         self.pixmapDolu = pixmapDolu
-        self.table_no = int()
+        self.table_no = table_no
+        self.age = age
         
     def sit_at_table(self):
-        text = f"{self.customer_no} no'lu müşteri {self.table_no} masaya oturdu"
+        text = f"{self.customer_no} no'lu müşteri {self.table_no} masaya oturdu (Yaş: {self.age})"
         print(text)
         
         Prb1Panel.addCustomerTable(text)
@@ -61,6 +62,7 @@ class Customer():
         print(text)
         Prb1Panel.addCustomerTable(text)
         
+        time.sleep(1)
         t = threading.Thread(target=(self.pay()), args=())
         t.start()    
             
@@ -70,16 +72,29 @@ class Customer():
         global waitQueue
         global waiterL
         
-        time.sleep(1)
+        
         text = f"{self.customer_no} no'lu müşteri hesabı ödedi ve restorandan ayrıldı"
         print(text)
         
-        del inQueue[inQueue.index(self)]
+        Prb1Panel.addCustomerTable(text)
+        kasa.odeme(self.customer_no)
+        
         try:
+            time.sleep(0.2)
+            print("Yeni müşteri geldi!!!!!!")
             c = waitQueue.pop(0)
-            t = threading.Thread(target=c.to_order, args=())
+            a = inQueue[inQueue.index(self)]
+            print(type(c))
+            c.table_no = a.table_no
+            del inQueue[inQueue.index(self)]
+            
+            t = threading.Thread(target=c.sit_at_table, args=())
             t.start()
             
+            
+            t = threading.Thread(target=c.to_order, args=())
+            t.start()
+        
             waiter = waiterList[waiterL[0]]
             waiterL.pop(0)
             if len(waiterL) == 0:
@@ -88,14 +103,10 @@ class Customer():
             
             t_siparis = threading.Thread(target=waiter.siparis_al, args=(c,))
             t_siparis.start()
-        except:
-            pass
         
-        Prb1Panel.addCustomerTable(text)
-        kasa.odeme(self.customer_no)
+        except Exception as e:
+            print(e)
         
-
-    
 
 
 class Waiter():
@@ -684,6 +695,7 @@ def run():
     global inQueue
     global availableTables
     global waiterL
+    global waitQueue
     
     # Toplam müşteri sayısı hesaplanıyor
     total = 0
@@ -778,8 +790,10 @@ def run():
     print("=========================================================")
 
     
-    waitQueue = oncelikliQueue
-    waitQueue += normalQueue
+    for queue in oncelikliQueue:
+        waitQueue += queue
+    for queue in normalQueue:
+        waitQueue += queue
     
     #while len(inQueue) != 0:
     # Garson Çağırma
