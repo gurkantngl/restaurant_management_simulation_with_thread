@@ -83,10 +83,10 @@ class Customer():
             time.sleep(0.2)
             print("Yeni müşteri geldi!!!!!!")
             c = waitQueue.pop(0)
+            inQueue.append(c)
             a = inQueue[inQueue.index(self)]
             print(type(c))
             c.table_no = a.table_no
-            del inQueue[inQueue.index(self)]
             
             t = threading.Thread(target=c.sit_at_table, args=())
             t.start()
@@ -103,7 +103,7 @@ class Customer():
             
             t_siparis = threading.Thread(target=waiter.siparis_al, args=(c,))
             t_siparis.start()
-        
+            
         except Exception as e:
             print(e)
         
@@ -681,8 +681,25 @@ class Prb2Panel(QWidget):
         self.initUI()
 
     def initUI(self):
-        pass
+        self.backgroundLabel = QtWidgets.QLabel(self)
+        pixmap = QtGui.QPixmap('img/image.png')
+        self.backgroundLabel.setPixmap(pixmap)
+        self.backgroundLabel.setGeometry(0, 0, self.width(), self.height())
+        self.backgroundLabel.setScaledContents(True)
 
+        
+        self.label = QtWidgets.QLabel(self)
+        self.label.setGeometry(QtCore.QRect(250, 80, 170, 70))
+        self.label.setText("Adım Sayısı Giriniz")
+        font = QtGui.QFont()
+        font.setFamily("Noto Serif Georgian")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label.setFont(font)
+        self.label.setObjectName("label")
+        
+        
  
 def run():
     global value1List
@@ -722,7 +739,8 @@ def run():
         # o adımdaki öncelikli müşteri sayısı kadar döngü döner
         for _ in range(value1):
             # her müşteri için thread açılır
-            customer = Customer(customer_no=customerCounter, table_no=availableTables[0], table=masaList[availableTables[0]-1], pixmapBos=pixmapBos, pixmapDolu=pixmapDolu)
+            age = random.randint(65, 86)
+            customer = Customer(customer_no=customerCounter, table_no=availableTables[0], table=masaList[availableTables[0]-1], pixmapBos=pixmapBos, pixmapDolu=pixmapDolu, age=age)
             availableTables.pop(0)
             if len(availableTables) == 0:
                 availableTables = [1, 2, 3, 4, 5, 6]
@@ -737,7 +755,8 @@ def run():
         # adımdaki normal müşteri sayısı kadar döngü döner
         for _ in range(value2):
             # her müşteri için thread oluşturulur
-            customer = Customer(customer_no=customerCounter, table_no=availableTables[0], table=masaList[availableTables[0]-1], pixmapBos=pixmapBos, pixmapDolu=pixmapDolu)
+            age = random.randint(15, 65)
+            customer = Customer(customer_no=customerCounter, table_no=availableTables[0], table=masaList[availableTables[0]-1], pixmapBos=pixmapBos, pixmapDolu=pixmapDolu, age=age)
             availableTables.pop(0)
             if len(availableTables) == 0:
                 availableTables = [1, 2, 3, 4, 5, 6]
