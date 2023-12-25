@@ -39,6 +39,7 @@ class Customer():
     def sit_at_table(self):
         text = f"{self.customer_no} no'lu müşteri {self.table_no} masaya oturdu (Yaş: {self.age})"
         print(text)
+        self.table.setPixmap(self.pixmapDolu)
         
         Prb1Panel.addCustomerTable(text)
         
@@ -75,7 +76,7 @@ class Customer():
         
         text = f"{self.customer_no} no'lu müşteri hesabı ödedi ve restorandan ayrıldı"
         print(text)
-        
+        self.table.setPixmap(self.pixmapBos)
         Prb1Panel.addCustomerTable(text)
         kasa.odeme(self.customer_no)
         
@@ -87,6 +88,7 @@ class Customer():
             a = inQueue[inQueue.index(self)]
             print(type(c))
             c.table_no = a.table_no
+            c.table = a.table
             
             t = threading.Thread(target=c.sit_at_table, args=())
             t.start()
