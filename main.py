@@ -666,8 +666,6 @@ class Prb1Panel(QWidget):
         for oncelik in self.oncelikSpnList:
             oncelik.close()
         
-        
-        
         self.setFixedSize(1750, 800)
         self.backgroundLabel.setGeometry(0, 0, self.width(), self.height())
         t = threading.Thread(target=run, args=())
