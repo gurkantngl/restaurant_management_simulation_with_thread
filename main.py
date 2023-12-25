@@ -353,6 +353,12 @@ class Prb1Panel(QWidget):
         Prb1Panel.kasaTable.setColumnWidth(0, 400)
 
 
+        Prb1Panel.pixmapBos = QtGui.QPixmap('img/bos.jpg')
+        Prb1Panel.pixmapDolu = QtGui.QPixmap('img/dolu.jpg')
+        
+
+
+
     def initUI(self):
         self.normalSpnList = []
         self.oncelikSpnList = []
@@ -688,19 +694,102 @@ class Prb2Panel(QWidget):
         self.backgroundLabel.setScaledContents(True)
 
         
-        self.label = QtWidgets.QLabel(self)
-        self.label.setGeometry(QtCore.QRect(250, 80, 170, 70))
-        self.label.setText("Adım Sayısı Giriniz")
+        self.inputSaniye= QLineEdit(self)
+        self.inputSaniye.setGeometry(QtCore.QRect(200, 170, 40, 30))
+        font = QtGui.QFont()
+        font.setFamily("Noto Sans Lao")
+        font.setBold(True)
+        font.setWeight(75)
+        self.inputSaniye.setFont(font)
+        self.inputSaniye.setObjectName("inputAdimSayisi")
+        
+        self.labelSaniye = QtWidgets.QLabel(self)
+        self.labelSaniye.setGeometry(QtCore.QRect(250, 170, 85, 30))
+        self.labelSaniye.setText("saniyede")
         font = QtGui.QFont()
         font.setFamily("Noto Serif Georgian")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
-        self.label.setFont(font)
-        self.label.setObjectName("label")
+        self.labelSaniye.setFont(font)
+        self.labelSaniye.setObjectName("labelSaniye")
+        
+        self.inputCustomer= QLineEdit(self)
+        self.inputCustomer.setGeometry(QtCore.QRect(350, 170, 40, 30))
+        font = QtGui.QFont()
+        font.setFamily("Noto Sans Lao")
+        font.setBold(True)
+        font.setWeight(75)
+        self.inputCustomer.setFont(font)
+        self.inputCustomer.setObjectName("inputCustomer")
         
         
- 
+        self.labelCustomer = QtWidgets.QLabel(self)
+        self.labelCustomer.setGeometry(QtCore.QRect(400, 170, 85, 30))
+        self.labelCustomer.setText("müşteri")
+        font = QtGui.QFont()
+        font.setFamily("Noto Serif Georgian")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.labelCustomer.setFont(font)
+        self.labelCustomer.setObjectName("labelCustomer")
+        
+        self.labelSure = QtWidgets.QLabel(self)
+        self.labelSure.setGeometry(QtCore.QRect(220, 200, 170, 70))
+        self.labelSure.setText("Süre (Saniye): ")
+        font = QtGui.QFont()
+        font.setFamily("Noto Serif Georgian")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.labelSure.setFont(font)
+        self.labelSure.setObjectName("labelSure")
+        
+        
+        self.inputSure= QLineEdit(self)
+        self.inputSure.setGeometry(QtCore.QRect(360, 210, 60, 40))
+        font = QtGui.QFont()
+        font.setFamily("Noto Sans Lao")
+        font.setBold(True)
+        font.setWeight(75)
+        self.inputSure.setFont(font)
+        self.inputSure.setObjectName("inputCustomer")
+        
+        self.btnStart = QtWidgets.QPushButton(self)
+        self.btnStart.setEnabled(True)
+        self.btnStart.setGeometry(QtCore.QRect(270, 300, 120, 50))
+        font = QtGui.QFont()
+        font.setFamily("Noto Serif Cond")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setItalic(True)
+        font.setWeight(75)
+        self.btnStart.setFont(font)
+        self.btnStart.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.btnStart.setObjectName("btnStart")
+        self.btnStart.clicked.connect(self.run)
+        self.btnStart.setText("Başlat")
+        
+    def run(self):
+        saniye = int(self.inputSaniye.text())
+        customer = int(self.inputCustomer.text())
+        topSure = int(self.inputSure.text())
+        
+        
+        self.inputSaniye.close()
+        self.labelSaniye.close()
+        self.inputCustomer.close()
+        self.labelCustomer.close()
+        self.inputSure.close()
+        self.labelSure.close()
+        self.btnStart.close()
+        
+    
+    
+    
+    
+        
 def run():
     global value1List
     global value2List
