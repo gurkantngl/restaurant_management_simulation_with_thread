@@ -18,12 +18,13 @@ customerCounter = 1
 masaList = []
 value1List = []
 value2List = []
-pixmapBos = int()
-pixmapDolu = int()
+pixmapBos = object()
+pixmapDolu = object()
 waiterList = []
 cookerList = []
-kasa = int()
+kasa = object()
 waiterL = [0, 1, 2]
+kasaUI = object()
 
 
 class Customer():
@@ -58,14 +59,16 @@ class Customer():
         self.eat_order()
     
     def eat_order(self):
+        global kasaUI
+        
         time.sleep(3)
         text = f"{self.customer_no} no'lu müşteri siparişini yedi"
         print(text)
         Prb1Panel.addCustomerTable(text)
         
-        time.sleep(1)
-        t = threading.Thread(target=(self.pay()), args=())
-        t.start()    
+        
+        t = threading.Thread(target=(kasa.odeme), args=(self.customer_no, self))
+        t.start()
             
     def pay(self):
         global kasa
@@ -78,7 +81,7 @@ class Customer():
         print(text)
         self.table.setPixmap(self.pixmapBos)
         Prb1Panel.addCustomerTable(text)
-        kasa.odeme(self.customer_no)
+        
         
         try:
             time.sleep(0.2)
@@ -112,16 +115,20 @@ class Customer():
 
 
 class Waiter():
-    def __init__(self, waiter_no):
+    def __init__(self, waiter_no, waiterUI, pixmapBos, pixmapDolu):
         super().__init__()
         self.waiter_no = waiter_no
         self.table_no = 0
         self.lock = threading.Semaphore()
         self.cookerL = [0, 1]
+        self.waiterUI = waiterUI
+        self.pixmapBos = pixmapBos
+        self.pixmapDolu = pixmapDolu
         
     def siparis_al(self, customer):
         self.lock.acquire()
         try:
+            self.waiterUI.setPixmap(pixmapDolu)
             text = f"{self.waiter_no} no'lu garson {customer.customer_no} no'lu müşterinin siparişini alıyor\n"
             print(text) 
             Prb1Panel.addWaiterTable(text)
@@ -131,6 +138,8 @@ class Waiter():
             print(text)
             Prb1Panel.addWaiterTable(text)
             self.mutfaga_ilet(customer)
+            self.waiterUI.setPixmap(pixmapBos)
+            time.sleep(0.2)
 
         finally:
             self.lock.release()
@@ -164,15 +173,19 @@ class Waiter():
             self.lock.release()
 
 class Cooker():
-    def __init__(self, cooker_no):
+    def __init__(self, cooker_no, cookerUI, pixmapBos, pixmapDolu):
         super().__init__() 
         self.cooker_no = cooker_no
         self.table_no = 0
         self.semaphore = threading.Semaphore(2)
+        self.cookerUI = cookerUI
+        self.pixmapBos = pixmapBos
+        self.pixmapDolu = pixmapDolu
         
     def siparis_hazirla(self, customer):
         self.semaphore.acquire()
         try:
+            self.cookerUI.setPixmap(self.pixmapDolu)
             text = f"{self.cooker_no} no'lu aşçı {customer.customer_no} no'lu müşterinin siparişini hazırlıyor\n"
             print(text)
             Prb1Panel.addCookerTable(text)
@@ -183,6 +196,7 @@ class Cooker():
         
         
     def siparis_hazir(self, customer):
+        self.cookerUI.setPixmap(pixmapBos)
         text = f"{self.cooker_no} no'lu aşçı {customer.customer_no} no'lu müşterinin siparişini hazırladı\n"
         print(text)
         Prb1Panel.addCookerTable(text)
@@ -202,15 +216,24 @@ class Cooker():
 
 
 class Kasa():
-    def __init__(self):
+    def __init__(self, kasaUI, pixmapBos, pixmapDolu):
         self.semaphore = threading.Semaphore()
+        self.kasaUI = kasaUI
+        self.pixmapBos = pixmapBos
+        self.pixmapBosDolu = pixmapDolu
         
-    def odeme(self, customer_no):
+    def odeme(self, customer_no, customer):
         self.semaphore.acquire()
         try:
+            self.kasaUI.setPixmap(pixmapDolu)
+            time.sleep(1)
             text = f"{customer_no} no'lu müşterinin ödemesi alındı"
             print(text)
             Prb1Panel.addKasaTable(text)
+            self.kasaUI.setPixmap(pixmapBos)
+            t = threading.Thread(target=(customer.pay), args=())
+            t.start()
+            time.sleep(0.2)
             
         finally:
             self.semaphore.release()
@@ -490,6 +513,7 @@ class Prb1Panel(QWidget):
         global waiterList
         global cookerList
         global kasa
+        global kasaUI
         
         self.lblNormal.close()
         self.lblOncelik.close()
@@ -577,7 +601,7 @@ class Prb1Panel(QWidget):
         self.garson1.setGeometry(300, 50, 20, 40)
         self.garson1.setVisible(True)
         self.garson1.setScaledContents(True)
-        garson = Waiter(1)
+        garson = Waiter(1, self.garson1, pixmapBos=pixmapBos, pixmapDolu=pixmapDolu)
         waiterList.append(garson)
         
         self.garson2 = QtWidgets.QLabel(self)
@@ -585,7 +609,7 @@ class Prb1Panel(QWidget):
         self.garson2.setGeometry(350, 50, 20, 40)
         self.garson2.setVisible(True)
         self.garson2.setScaledContents(True)
-        garson = Waiter(2)
+        garson = Waiter(2, self.garson2, pixmapBos=pixmapBos, pixmapDolu=pixmapDolu)
         waiterList.append(garson)
         
         self.garson3 = QtWidgets.QLabel(self)
@@ -593,7 +617,7 @@ class Prb1Panel(QWidget):
         self.garson3.setGeometry(400, 50, 20, 40)
         self.garson3.setVisible(True)
         self.garson3.setScaledContents(True)
-        garson = Waiter(3)
+        garson = Waiter(3, self.garson3, pixmapBos=pixmapBos, pixmapDolu=pixmapDolu)
         waiterList.append(garson)
         
         
@@ -609,7 +633,7 @@ class Prb1Panel(QWidget):
         self.asci1.setGeometry(500, 50, 20, 40)
         self.asci1.setVisible(True)
         self.asci1.setScaledContents(True)
-        asci = Cooker(1)
+        asci = Cooker(1, self.asci1, pixmapBos=pixmapBos, pixmapDolu=pixmapDolu)
         cookerList.append(asci)
         
         self.asci2 = QtWidgets.QLabel(self)
@@ -617,7 +641,7 @@ class Prb1Panel(QWidget):
         self.asci2.setGeometry(550, 50, 20, 40)
         self.asci2.setVisible(True)
         self.asci2.setScaledContents(True)
-        asci = Cooker(2)
+        asci = Cooker(2, self.asci2, pixmapBos=pixmapBos, pixmapDolu=pixmapDolu)
         cookerList.append(asci)
     
         self.lblKasa = QLabel("Kasa", self)
@@ -630,8 +654,8 @@ class Prb1Panel(QWidget):
         self.kasa.setGeometry(650, 50, 60, 60)
         self.kasa.setVisible(True)
         self.kasa.setScaledContents(True)
-        kasa = Kasa()
-        
+        kasa = Kasa(self.kasa, pixmapBos=pixmapBos, pixmapDolu=pixmapDolu)
+        kasaUI = self.kasa
         
         for lbl in self.lblList:
             lbl.close()
