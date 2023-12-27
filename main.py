@@ -36,6 +36,15 @@ class Customer():
         self.pixmapDolu = pixmapDolu
         self.table_no = table_no
         self.age = age
+        self.time = time.time()
+        
+    def calculate_time(self):
+        while True:
+            currTime = time.time()
+            fark = currTime - self.time
+            if fark >= 10:
+                index = waitQueue.index(self)
+                del waitQueue[index]
         
     def sit_at_table(self):
         text = f"{self.customer_no} no'lu müşteri {self.table_no} masaya oturdu (Yaş: {self.age})"
@@ -800,6 +809,51 @@ class Prb2Panel(QWidget):
         customer = int(self.inputCustomer.text())
         topSure = int(self.inputSure.text())
         
+        totalCustomer = (topSure // saniye) * customer
+        customers = []
+        print(totalCustomer)
+        gelis = 0
+        gidis = 8
+        gidisList = []
+        gidisQueue = []
+        
+        for i in range(topSure // saniye):
+            for j in range(customer):
+                customers.append({})
+                customers[-1]["gelis"] = gelis
+                giris = int()
+                try:
+                    if gidisQueue[0] <= gelis:
+                        giris = gidisQueue[0]
+                    else:
+                        giris = gelis
+                    gidisQueue.pop(0)   
+                except:
+                    continue
+                finally:
+                    customers[-1]["giris"] = giris
+                    
+                    gidis = gelis + 9
+                    
+                    if gidis in gidisList:
+                        gidis = max(gidisList) + 1
+                    
+                    customers[-1]["gidis"] = gidis
+                    gidisList.append(gidis)
+                    gidisQueue.append(gidis)
+            gelis += saniye
+            
+        for customer in customers:
+            print(customer["gelis"], customer["gidis"])
+        
+            
+            
+            
+                    
+        tableNumber = int()
+        waiterNumber = int()
+        cookerNumber = int()
+        
         
         self.inputSaniye.close()
         self.labelSaniye.close()
@@ -943,7 +997,6 @@ def run():
                             
         t_siparis = threading.Thread(target=waiter.siparis_al, args=(customer,))
         t_siparis.start()
-    
     
     
 
