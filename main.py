@@ -42,13 +42,19 @@ class Customer():
         while True:
             currTime = time.time()
             fark = currTime - self.time
-            if fark >= 10:
+            if fark >= 20 and self in waitQueue:
                 index = waitQueue.index(self)
                 del waitQueue[index]
-        
+                text = f"{self.customer_no} no'lu müşteri 20 saniye bekledikten sonra ayrıldı"
+                Prb1Panel.addCustomerTable(text)
+                break
+            print(f"{self.customer_no} fark: {fark}\n")
+            if self not in waitQueue:
+                break
+            time.sleep(1)
+                   
     def sit_at_table(self):
         text = f"{self.customer_no} no'lu müşteri {self.table_no} masaya oturdu (Yaş: {self.age})"
-        print(text)
         self.table.setPixmap(self.pixmapDolu)
         
         Prb1Panel.addCustomerTable(text)
@@ -57,13 +63,11 @@ class Customer():
         global waiterList
         
         text = f"{self.customer_no} no'lu müşteri garson çağırdı"
-        print(text)
         Prb1Panel.addCustomerTable(text)
         time.sleep(0.2)
         
     def take_order(self):
         text = f"{self.customer_no} no'lu müşteri siparişini aldı"
-        print(text)
         Prb1Panel.addCustomerTable(text)
         self.eat_order()
     
@@ -72,7 +76,6 @@ class Customer():
         
         time.sleep(3)
         text = f"{self.customer_no} no'lu müşteri siparişini yedi"
-        print(text)
         Prb1Panel.addCustomerTable(text)
         
         
@@ -87,18 +90,15 @@ class Customer():
         
         
         text = f"{self.customer_no} no'lu müşteri hesabı ödedi ve restorandan ayrıldı"
-        print(text)
         self.table.setPixmap(self.pixmapBos)
         Prb1Panel.addCustomerTable(text)
         
         
         try:
             time.sleep(0.2)
-            print("Yeni müşteri geldi!!!!!!")
             c = waitQueue.pop(0)
             inQueue.append(c)
             a = inQueue[inQueue.index(self)]
-            print(type(c))
             c.table_no = a.table_no
             c.table = a.table
             
@@ -139,12 +139,10 @@ class Waiter():
         try:
             self.waiterUI.setPixmap(pixmapDolu)
             text = f"{self.waiter_no} no'lu garson {customer.customer_no} no'lu müşterinin siparişini alıyor\n"
-            print(text) 
             Prb1Panel.addWaiterTable(text)
             time.sleep(2)
             
             text = f"{self.waiter_no} no'lu garson {customer.customer_no} no'lu müşterinin siparişini aldı\n"
-            print(text)
             Prb1Panel.addWaiterTable(text)
             self.mutfaga_ilet(customer)
             self.waiterUI.setPixmap(pixmapBos)
@@ -157,7 +155,6 @@ class Waiter():
         global cookerList
     
         text = f"{self.waiter_no} no'lu garson {customer.customer_no} no'lu müşterinin siparişini mutfağa iletti\n"
-        print(text)
         Prb1Panel.addWaiterTable(text)
         
         cooker = cookerList[self.cookerL[0]]
@@ -171,7 +168,6 @@ class Waiter():
         self.lock.acquire()
         try:
             text = f"{self.waiter_no} no'lu garson {customer.customer_no} no'lu müşterinin siparişini teslim etti\n"
-            print(text)
             Prb1Panel.addWaiterTable(text)
             
             t = threading.Thread(target=customer.take_order, args=())
@@ -196,7 +192,6 @@ class Cooker():
         try:
             self.cookerUI.setPixmap(self.pixmapDolu)
             text = f"{self.cooker_no} no'lu aşçı {customer.customer_no} no'lu müşterinin siparişini hazırlıyor\n"
-            print(text)
             Prb1Panel.addCookerTable(text)
             time.sleep(3)
             self.siparis_hazir(customer)
@@ -207,7 +202,6 @@ class Cooker():
     def siparis_hazir(self, customer):
         self.cookerUI.setPixmap(pixmapBos)
         text = f"{self.cooker_no} no'lu aşçı {customer.customer_no} no'lu müşterinin siparişini hazırladı\n"
-        print(text)
         Prb1Panel.addCookerTable(text)
 
         waiterL = [0, 1, 2]
@@ -237,7 +231,6 @@ class Kasa():
             self.kasaUI.setPixmap(pixmapDolu)
             time.sleep(1)
             text = f"{customer_no} no'lu müşterinin ödemesi alındı"
-            print(text)
             Prb1Panel.addKasaTable(text)
             self.kasaUI.setPixmap(pixmapBos)
             t = threading.Thread(target=(customer.pay), args=())
@@ -844,11 +837,7 @@ class Prb2Panel(QWidget):
             gelis += saniye
             
         for customer in customers:
-            print(customer["gelis"], customer["gidis"])
-        
-            
-            
-            
+            print(customer["gelis"], customer["gidis"])    
                     
         tableNumber = int()
         waiterNumber = int()
@@ -863,8 +852,7 @@ class Prb2Panel(QWidget):
         self.labelSure.close()
         self.btnStart.close()
         
-    
-    
+
     
     
         
@@ -980,6 +968,10 @@ def run():
         waitQueue += queue
     for queue in normalQueue:
         waitQueue += queue
+    
+    for customer in waitQueue:
+        t = threading.Thread(target=customer.calculate_time, args=())
+        t.start()
     
     #while len(inQueue) != 0:
     # Garson Çağırma
