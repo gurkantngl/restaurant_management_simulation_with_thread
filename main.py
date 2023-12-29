@@ -800,23 +800,38 @@ class Prb2Panel(QWidget):
         tmpKazanc = 0
         kazanc = 0
         
+        table = 4
+        waiter = 2
+        cooker = 1
+           
+        kazanc = self.calculate(table, waiter, cooker)
+
+        print(kazanc)
+
+        self.inputSaniye.close()
+        self.labelSaniye.close()
+        self.inputCustomer.close()
+        self.labelCustomer.close()
+        self.inputSure.close()
+        self.labelSure.close()
+        self.btnStart.close()
+        
+    def calculate(self, table, waiter, cooker):
         saniye = int(self.inputSaniye.text())
         customer = int(self.inputCustomer.text())
         topSure = int(self.inputSure.text())
         checkGidis = []
-        checkWaiter = []
-        checkCooker = []
+        checkWaiter = [0]
+        checkCooker = [2, 2]
+        leftCounter = 0
+        waiterList = []
+        cookerList = []
         
         totalCustomer = (topSure // saniye) * customer
         customers = []
         print(totalCustomer) 
-        
-        table = 1
-        tableList = [True]
-        waiter = 1
-        cooker = 1
-        leftCounter = 0
-        
+    
+
         for i in range(topSure // saniye):
             for j in range(customer):
                 customers.append({})
@@ -824,12 +839,38 @@ class Prb2Panel(QWidget):
 
         for i in range(min(table, customer)):
             customers[i]["giris"] = customers[i]["gelis"]
-            customers[i]["takeOrder"] = 2
-            customers[i]["readyOrder"] = 5
-            customers[i]["gidis"] = 9 + customers[i]["gelis"] + i
-            checkGidis.append(customers[i]["gidis"])
+            
+            index = checkWaiter.index(min(checkWaiter))
+            if min(checkWaiter) < customers[i]["giris"]:
+                takeOrder = customers[i]["giris"] + 2
+            else:
+                takeOrder = min(checkWaiter) + 2
+            customers[i]["takeOrder"] = min(checkWaiter) + 2
+            del checkWaiter[index]
             checkWaiter.append(customers[i]["takeOrder"])
+            
+            if i <= waiter:
+                waiterList.append(customers[i]["takeOrder"])
+            
+            index = checkCooker.index(min(checkCooker))
+            if min(checkCooker) < customers[i]["takeOrder"]:
+                readyOrder = customers[i]["takeOrder"] + 3
+            else:
+                readyOrder = min(checkCooker) + 3
+            customers[i]["readyOrder"] = readyOrder
+            del checkCooker[index]
             checkCooker.append(customers[i]["readyOrder"])
+            
+            if i <= cooker:
+                cookerList.append(customers[i]["readyOrder"])
+            
+            gidis = customers[i]["readyOrder"] + 4
+            
+            if gidis in checkGidis:
+                gidis += 1
+            
+            customers[i]["gidis"] = gidis
+            checkGidis.append(customers[i]["gidis"])
 
         for i in range(min(table,customer), len(customers)):
             girisIndex = checkGidis.index(min(checkGidis))
@@ -844,7 +885,10 @@ class Prb2Panel(QWidget):
             
             takeOrderIndex = checkWaiter.index(min(checkWaiter))
             takeOrder = customers[i]["giris"] + 2
-            if takeOrder < min(checkWaiter):
+            
+            if i < waiter:
+                waiterList.append(takeOrder)
+            elif takeOrder < min(checkWaiter):
                 takeOrder = min(checkWaiter) + 2
             customers[i]["takeOrder"] = takeOrder
             del checkWaiter[takeOrderIndex]
@@ -852,7 +896,9 @@ class Prb2Panel(QWidget):
 
             readyOrderIndex = checkCooker.index(min(checkCooker))
             readyOrder = int(customers[i]["takeOrder"]) + 3
-            if readyOrder < min(checkCooker):
+            if i < cooker:
+                cookerList.append(readyOrder) 
+            elif readyOrder < min(checkCooker):
                 readyOrder = min(checkCooker) + 3
             customers[i]["readyOrder"] = readyOrder
             del checkCooker[readyOrderIndex] 
@@ -867,19 +913,9 @@ class Prb2Panel(QWidget):
         
         
         kazanc = totalCustomer - leftCounter - table - waiter - cooker
-           
-
-        self.inputSaniye.close()
-        self.labelSaniye.close()
-        self.inputCustomer.close()
-        self.labelCustomer.close()
-        self.inputSure.close()
-        self.labelSure.close()
-        self.btnStart.close()
         
-
-    
-    
+        return kazanc
+        
         
 def run():
     global value1List
