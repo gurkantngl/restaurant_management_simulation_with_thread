@@ -800,14 +800,50 @@ class Prb2Panel(QWidget):
         tmpKazanc = 0
         kazanc = 0
         
-        table = 4
-        waiter = 2
+        table = 1
+        waiter = 1
         cooker = 1
            
+           
         kazanc = self.calculate(table, waiter, cooker)
-
+        
+        """
+        # Optimum masa sayısını hesaplayan döngü
+        while tmpKazanc < kazanc:
+            table += 1
+            tmpKazanc = kazanc
+            kazanc = self.calculate(table, waiter, cooker) 
+        table -= 1
+        print(f"Optimum masa sayısı: {table}")
+        
+        waiter += 1
+        kazanc = self.calculate(table, waiter, cooker)
+        if tmpKazanc < kazanc:
+        # Optimum garson sayısını hesaplayan döngü
+            while tmpKazanc < kazanc:
+                waiter += 1
+                tmpKazanc = kazanc
+                kazanc = self.calculate(table, waiter, cooker)
+            waiter -= 1
+        else:
+            waiter -= 1
+        
+        print(f"Optimum garson sayısı {waiter}")
+        cooker += 1
+        kazanc = self.calculate(table, waiter, cooker)
+        if tmpKazanc < kazanc:
+        # Optimum aşçı sayısını hesaplayan döngü
+            while tmpKazanc < kazanc:
+                cooker += 1
+                tmpKazanc = kazanc
+                kazanc = self.calculate(table, waiter, cooker)
+            cooker -= 1
+        else:
+            cooker -= 1
+        print(f"Optimum aşçı sayısı: {cooker}")
+        
         print(kazanc)
-
+        """
         self.inputSaniye.close()
         self.labelSaniye.close()
         self.inputCustomer.close()
@@ -821,15 +857,14 @@ class Prb2Panel(QWidget):
         customer = int(self.inputCustomer.text())
         topSure = int(self.inputSure.text())
         checkGidis = []
-        checkWaiter = [0]
-        checkCooker = [2, 2]
+        checkWaiter = [0 for i in range(waiter)]
+        checkCooker = [2 for i in range(cooker*2)]
         leftCounter = 0
         waiterList = []
         cookerList = []
         
         totalCustomer = (topSure // saniye) * customer
         customers = []
-        print(totalCustomer) 
     
 
         for i in range(topSure // saniye):
@@ -876,7 +911,7 @@ class Prb2Panel(QWidget):
             girisIndex = checkGidis.index(min(checkGidis))
             giris = checkGidis[girisIndex]
             
-            if giris - int(customers[i]["gelis"]) >= 20:
+            if giris - int(customers[i]["gelis"]) > 20:
                 leftCounter += 1
                 continue 
             
@@ -913,6 +948,13 @@ class Prb2Panel(QWidget):
         
         
         kazanc = totalCustomer - leftCounter - table - waiter - cooker
+        
+        print(f"Toplam Masa Sayısı: {table}")
+        print(f"Toplam Garson Sayısı: {waiter}")
+        print(f"Toplam Aşçı Sayısı: {cooker}")
+        print(f"Toplam Müşteri sayısı: {totalCustomer}")
+        print("Ayrılan müşteri sayısı: ", leftCounter)
+        print("============================================")
         
         return kazanc
         
