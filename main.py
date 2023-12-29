@@ -7,7 +7,6 @@ import time
 import random
 
 
-
 adimSayisi = 0
 normalQueue = []
 oncelikliQueue = []
@@ -798,52 +797,78 @@ class Prb2Panel(QWidget):
         self.btnStart.setText("Başlat")
         
     def run(self):
+        tmpKazanc = 0
+        kazanc = 0
+        
         saniye = int(self.inputSaniye.text())
         customer = int(self.inputCustomer.text())
         topSure = int(self.inputSure.text())
+        checkGidis = []
+        checkWaiter = []
+        checkCooker = []
         
         totalCustomer = (topSure // saniye) * customer
         customers = []
-        print(totalCustomer)
-        gelis = 0
-        gidis = 8
-        gidisList = []
-        gidisQueue = []
+        print(totalCustomer) 
+        
+        table = 1
+        tableList = [True]
+        waiter = 1
+        cooker = 1
+        leftCounter = 0
         
         for i in range(topSure // saniye):
             for j in range(customer):
                 customers.append({})
-                customers[-1]["gelis"] = gelis
-                giris = int()
-                try:
-                    if gidisQueue[0] <= gelis:
-                        giris = gidisQueue[0]
-                    else:
-                        giris = gelis
-                    gidisQueue.pop(0)   
-                except:
-                    continue
-                finally:
-                    customers[-1]["giris"] = giris
-                    
-                    gidis = gelis + 9
-                    
-                    if gidis in gidisList:
-                        gidis = max(gidisList) + 1
-                    
-                    customers[-1]["gidis"] = gidis
-                    gidisList.append(gidis)
-                    gidisQueue.append(gidis)
-            gelis += saniye
+                customers[-1]["gelis"] = i * saniye
+
+        for i in range(min(table, customer)):
+            customers[i]["giris"] = customers[i]["gelis"]
+            customers[i]["takeOrder"] = 2
+            customers[i]["readyOrder"] = 5
+            customers[i]["gidis"] = 9 + customers[i]["gelis"] + i
+            checkGidis.append(customers[i]["gidis"])
+            checkWaiter.append(customers[i]["takeOrder"])
+            checkCooker.append(customers[i]["readyOrder"])
+
+        for i in range(min(table,customer), len(customers)):
+            girisIndex = checkGidis.index(min(checkGidis))
+            giris = checkGidis[girisIndex]
             
-        for customer in customers:
-            print(customer["gelis"], customer["gidis"])    
-                    
-        tableNumber = int()
-        waiterNumber = int()
-        cookerNumber = int()
+            if giris - int(customers[i]["gelis"]) >= 20:
+                leftCounter += 1
+                continue 
+            
+            customers[i]["giris"] = checkGidis[girisIndex]
+            del checkGidis[girisIndex]
+            
+            takeOrderIndex = checkWaiter.index(min(checkWaiter))
+            takeOrder = customers[i]["giris"] + 2
+            if takeOrder < min(checkWaiter):
+                takeOrder = min(checkWaiter) + 2
+            customers[i]["takeOrder"] = takeOrder
+            del checkWaiter[takeOrderIndex]
+            checkWaiter.append(customers[i]["takeOrder"])
+
+            readyOrderIndex = checkCooker.index(min(checkCooker))
+            readyOrder = int(customers[i]["takeOrder"]) + 3
+            if readyOrder < min(checkCooker):
+                readyOrder = min(checkCooker) + 3
+            customers[i]["readyOrder"] = readyOrder
+            del checkCooker[readyOrderIndex] 
+            checkCooker.append(customers[i]["readyOrder"])
+            
+            gidis = int(customers[i]["readyOrder"]) + 4
+            if gidis in checkGidis:
+                gidis += 1
+            
+            customers[i]["gidis"] = gidis
+            checkGidis.append(gidis)
         
         
+        kazanc = totalCustomer - leftCounter - table - waiter - cooker
+           
+
         self.inputSaniye.close()
         self.labelSaniye.close()
         self.inputCustomer.close()
