@@ -794,7 +794,7 @@ class Prb2Panel(QWidget):
         self.btnStart.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.btnStart.setObjectName("btnStart")
         self.btnStart.clicked.connect(self.run)
-        self.btnStart.setText("Başlat")
+        self.btnStart.setText("Hesapla")
         
     def run(self):
         tmpKazanc = 0
