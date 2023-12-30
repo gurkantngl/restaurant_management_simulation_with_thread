@@ -710,6 +710,20 @@ class Prb2Panel(QWidget):
         self.move(220, 80)
         self.setFixedSize(700, 500)
         self.initUI()
+        
+        font = QFont()
+        font.setBold(True)
+        
+        # Sonuç Tablosu
+        Prb2Panel.resultTable = QTableWidget(self)
+        Prb2Panel.resultTable.setColumnCount(1)
+        Prb2Panel.resultTable.setRowCount(5)
+        Prb2Panel.resultTable.move(100, 70)
+        Prb2Panel.resultTable.setFixedSize(500, 250)
+        Prb2Panel.resultTable.setVisible(False)
+        Prb2Panel.resultTable.setHorizontalHeaderLabels(["Sonuç"])
+        Prb2Panel.resultTable.horizontalHeader().setFont(font)
+        Prb2Panel.resultTable.setColumnWidth(0, 500)
 
     def initUI(self):
         self.backgroundLabel = QtWidgets.QLabel(self)
@@ -795,7 +809,8 @@ class Prb2Panel(QWidget):
         self.btnStart.setObjectName("btnStart")
         self.btnStart.clicked.connect(self.run)
         self.btnStart.setText("Hesapla")
-        
+    
+    
     def run(self):
         tmpKazanc = 0
         kazanc = 0
@@ -949,11 +964,31 @@ class Prb2Panel(QWidget):
         
         kazanc = totalCustomer - leftCounter - table - waiter - cooker
         
-        print(f"Toplam Masa Sayısı: {table}")
-        print(f"Toplam Garson Sayısı: {waiter}")
-        print(f"Toplam Aşçı Sayısı: {cooker}")
-        print(f"Toplam Müşteri sayısı: {totalCustomer}")
-        print("Ayrılan müşteri sayısı: ", leftCounter)
+        Prb2Panel.resultTable.setVisible(True)
+        text = f"Toplam Masa Sayısı: {table}"
+        item = item = QTableWidgetItem(text)
+        Prb2Panel.resultTable.setItem(0, 0, item)
+        print(text)
+        
+        text = f"Toplam Garson Sayısı: {waiter}"
+        item = item = QTableWidgetItem(text)
+        Prb2Panel.resultTable.setItem(1, 0, item)
+        print(text)
+        
+        text = f"Toplam Aşçı Sayısı: {cooker}"
+        item = item = QTableWidgetItem(text)
+        Prb2Panel.resultTable.setItem(2, 0, item)
+        print(text)
+        
+        text = f"Toplam Müşteri sayısı: {totalCustomer}"
+        item = item = QTableWidgetItem(text)
+        Prb2Panel.resultTable.setItem(3, 0, item)
+        print(text)
+        
+        text = f"Ayrılan müşteri sayısı: {leftCounter}"
+        item = item = QTableWidgetItem(text)
+        Prb2Panel.resultTable.setItem(4, 0, item)
+        print(text)
         print("============================================")
         
         return kazanc
