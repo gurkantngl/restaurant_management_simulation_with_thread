@@ -806,7 +806,7 @@ class Prb2Panel(QWidget):
            
            
         kazanc = self.calculate(table, waiter, cooker)
-        
+        print(kazanc)
         """
         # Optimum masa sayısını hesaplayan döngü
         while tmpKazanc < kazanc:
