@@ -815,8 +815,8 @@ class Prb2Panel(QWidget):
         tmpKazanc = 0
         kazanc = 0
         
-        table = 5    
-        waiter = 3
+        table = 3
+        waiter = 2
         cooker = 2
            
            
@@ -888,8 +888,10 @@ class Prb2Panel(QWidget):
                 customers[-1]["gelis"] = i * saniye
 
         for i in range(min(table, customer)):
+            # Müşterinin restorana giriş saniyesi belirlenir
             customers[i]["giris"] = customers[i]["gelis"]
             
+            # Müşterinin siparişinin alındığı saniye belirlenir
             index = checkWaiter.index(min(checkWaiter))
             if min(checkWaiter) < customers[i]["giris"]:
                 takeOrder = customers[i]["giris"] + 2
@@ -902,6 +904,7 @@ class Prb2Panel(QWidget):
             if i <= waiter:
                 waiterList.append(customers[i]["takeOrder"])
             
+            # Müşterinin siparişinin hazır olduğu saniye belirlenir
             index = checkCooker.index(min(checkCooker))
             if min(checkCooker) < customers[i]["takeOrder"]:
                 readyOrder = customers[i]["takeOrder"] + 3
@@ -914,6 +917,7 @@ class Prb2Panel(QWidget):
             if i <= cooker:
                 cookerList.append(customers[i]["readyOrder"])
             
+            # Müşterinin ayrıldığı saniye belirlenir
             gidis = customers[i]["readyOrder"] + 4
             
             if gidis in checkGidis:
@@ -926,6 +930,7 @@ class Prb2Panel(QWidget):
             girisIndex = checkGidis.index(min(checkGidis))
             giris = checkGidis[girisIndex]
             
+            # Müşterinin bekleme saniyesi kontrol edilir
             if giris - int(customers[i]["gelis"]) > 20:
                 leftCounter += 1
                 continue 
@@ -933,6 +938,7 @@ class Prb2Panel(QWidget):
             customers[i]["giris"] = checkGidis[girisIndex]
             del checkGidis[girisIndex]
             
+            # Müşterinin siparişinin alındığı saniye belirlenir
             takeOrderIndex = checkWaiter.index(min(checkWaiter))
             takeOrder = customers[i]["giris"] + 2
             
@@ -944,6 +950,7 @@ class Prb2Panel(QWidget):
             del checkWaiter[takeOrderIndex]
             checkWaiter.append(customers[i]["takeOrder"])
 
+            # Müşterinin siparişinin hazır olduğu saniye belirlenir
             readyOrderIndex = checkCooker.index(min(checkCooker))
             readyOrder = int(customers[i]["takeOrder"]) + 3
             if i < cooker:
@@ -954,6 +961,7 @@ class Prb2Panel(QWidget):
             del checkCooker[readyOrderIndex] 
             checkCooker.append(customers[i]["readyOrder"])
             
+            # Müşterinin restorandan ayrıldığı saniye belirlenir
             gidis = int(customers[i]["readyOrder"]) + 4
             if gidis in checkGidis:
                 gidis += 1
@@ -961,7 +969,7 @@ class Prb2Panel(QWidget):
             customers[i]["gidis"] = gidis
             checkGidis.append(gidis)
         
-        
+        # Kazanç hesaplanır = toplam müşteri - masa sayısı - garson sayısı - aşçı sayısı - ayrılan müşteri sayısı
         kazanc = totalCustomer - leftCounter - table - waiter - cooker
         
         Prb2Panel.resultTable.setVisible(True)
