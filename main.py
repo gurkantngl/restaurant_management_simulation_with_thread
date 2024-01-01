@@ -717,7 +717,7 @@ class Prb2Panel(QWidget):
         # Sonuç Tablosu
         Prb2Panel.resultTable = QTableWidget(self)
         Prb2Panel.resultTable.setColumnCount(1)
-        Prb2Panel.resultTable.setRowCount(5)
+        Prb2Panel.resultTable.setRowCount(6)
         Prb2Panel.resultTable.move(100, 70)
         Prb2Panel.resultTable.setFixedSize(500, 250)
         Prb2Panel.resultTable.setVisible(False)
@@ -815,15 +815,15 @@ class Prb2Panel(QWidget):
         tmpKazanc = 0
         kazanc = 0
         
-        table = 1
-        waiter = 1
-        cooker = 1
+        table = 5    
+        waiter = 3
+        cooker = 2
            
            
         kazanc = self.calculate(table, waiter, cooker)
         print(kazanc)
         
-        # Optimum masa sayısını hesaplayan döngü
+        """# Optimum masa sayısını hesaplayan döngü
         while tmpKazanc < kazanc:
             table += 1
             tmpKazanc = kazanc
@@ -857,7 +857,7 @@ class Prb2Panel(QWidget):
             cooker -= 1
         print(f"Optimum aşçı sayısı: {cooker}")
         
-        print(kazanc)
+        print(kazanc)"""
         
         self.inputSaniye.close()
         self.labelSaniye.close()
@@ -988,6 +988,12 @@ class Prb2Panel(QWidget):
         text = f"Ayrılan müşteri sayısı: {leftCounter}"
         item = item = QTableWidgetItem(text)
         Prb2Panel.resultTable.setItem(4, 0, item)
+        print(text)
+        print("============================================")
+        
+        text = f"Toplam Kazanç: {kazanc}"
+        item = item = QTableWidgetItem(text)
+        Prb2Panel.resultTable.setItem(5, 0, item)
         print(text)
         print("============================================")
         
