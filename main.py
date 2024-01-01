@@ -822,7 +822,7 @@ class Prb2Panel(QWidget):
            
         kazanc = self.calculate(table, waiter, cooker)
         print(kazanc)
-        """
+        
         # Optimum masa sayısını hesaplayan döngü
         while tmpKazanc < kazanc:
             table += 1
@@ -858,7 +858,7 @@ class Prb2Panel(QWidget):
         print(f"Optimum aşçı sayısı: {cooker}")
         
         print(kazanc)
-        """
+        
         self.inputSaniye.close()
         self.labelSaniye.close()
         self.inputCustomer.close()
