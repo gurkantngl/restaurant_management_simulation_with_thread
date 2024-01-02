@@ -814,16 +814,48 @@ class Prb2Panel(QWidget):
     def run(self):
         tmpKazanc = 0
         kazanc = 0
-        
-        table = 3
-        waiter = 1
-        cooker = 1
+        checkList = [True, True, True]
+        table = 5  
+        waiter = 2  
+        cooker = 2
            
            
         kazanc = self.calculate(table, waiter, cooker)
         print(kazanc)
+        tmpKazanc = kazanc
         
-        # Optimum masa sayısını hesaplayan döngü
+        while True in checkList:
+            for i in range(3):
+                if i==0 and checkList[i] == True:
+                    table += 1
+                    kazanc = self.calculate(table, waiter, cooker)
+                    if kazanc < tmpKazanc:
+                        checkList[i] = False
+                        table -= 1
+                    else:
+                        tmpKazanc = kazanc
+                        
+                elif i==1 and checkList[i] == True:
+                    waiter += 1
+                    kazanc = self.calculate(table, waiter, cooker)
+                    if kazanc < tmpKazanc:
+                        checkList[i] = False
+                        waiter -= 1
+                    else:
+                        tmpKazanc = kazanc
+                        
+                elif i==2 and checkList[i] == True:
+                    cooker += 1
+                    kazanc = self.calculate(table, waiter, cooker)
+                    if kazanc < tmpKazanc:
+                        checkList[i] = False
+                        cooker -= 1
+                    else:
+                        tmpKazanc = kazanc
+                    
+                    
+                    
+        """# Optimum masa sayısını hesaplayan döngü
         while tmpKazanc < kazanc:
             table += 1
             tmpKazanc = kazanc
@@ -855,7 +887,7 @@ class Prb2Panel(QWidget):
             cooker -= 1
         else:
             cooker -= 1
-        print(f"Optimum aşçı sayısı: {cooker}")
+        print(f"Optimum aşçı sayısı: {cooker}")"""
         
         print(kazanc)
         
@@ -887,7 +919,7 @@ class Prb2Panel(QWidget):
                 customers.append({})
                 customers[-1]["gelis"] = i * saniye
 
-        for i in range(max(table, customer)):
+        for i in range(min(table, customer)):
             # Müşterinin restorana giriş saniyesi belirlenir
             customers[i]["giris"] = customers[i]["gelis"]
             
@@ -926,7 +958,7 @@ class Prb2Panel(QWidget):
             customers[i]["gidis"] = gidis
             checkGidis.append(customers[i]["gidis"])
 
-        for i in range(max(table,customer), len(customers)):
+        for i in range(min(table,customer), len(customers)):
             girisIndex = checkGidis.index(min(checkGidis))
             giris = checkGidis[girisIndex]
             
