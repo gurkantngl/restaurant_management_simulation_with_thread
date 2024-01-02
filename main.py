@@ -815,7 +815,7 @@ class Prb2Panel(QWidget):
         tmpKazanc = 0
         kazanc = 0
         checkList = [True, True, True]
-        table = 5  
+        table = 5
         waiter = 2  
         cooker = 2
            
@@ -830,8 +830,20 @@ class Prb2Panel(QWidget):
                     table += 1
                     kazanc = self.calculate(table, waiter, cooker)
                     if kazanc < tmpKazanc:
-                        checkList[i] = False
-                        table -= 1
+                        waiter += 1
+                        kazanc = self.calculate(table, waiter, cooker)
+                        if kazanc < tmpKazanc:
+                            cooker += 1
+                            kazanc = self.calculate(table, waiter, cooker)
+                            if kazanc < tmpKazanc:
+                                checkList[i] = False
+                                table -= 1
+                                waiter -= 1
+                                cooker -= 1
+                            else:
+                                tmpKazanc = kazanc
+                        else:
+                            tmpKazanc = kazanc
                     else:
                         tmpKazanc = kazanc
                         
@@ -839,8 +851,19 @@ class Prb2Panel(QWidget):
                     waiter += 1
                     kazanc = self.calculate(table, waiter, cooker)
                     if kazanc < tmpKazanc:
-                        checkList[i] = False
-                        waiter -= 1
+                        cooker += 1
+                        kazanc = self.calculate(table, waiter, cooker)
+                        if kazanc < tmpKazanc:
+                            table += 1
+                            kazanc = self.calculate(table, waiter, cooker)
+                            if kazanc < tmpKazanc:
+                                checkList[i] = False
+                                waiter -= 1
+                                cooker -= 1
+                            else:
+                                tmpKazanc = kazanc
+                        else:
+                            tmpKazanc = kazanc  
                     else:
                         tmpKazanc = kazanc
                         
@@ -848,8 +871,20 @@ class Prb2Panel(QWidget):
                     cooker += 1
                     kazanc = self.calculate(table, waiter, cooker)
                     if kazanc < tmpKazanc:
-                        checkList[i] = False
-                        cooker -= 1
+                        waiter += 1
+                        kazanc = self.calculate(table, waiter, cooker)
+                        if kazanc < tmpKazanc:
+                            table += 1
+                            kazanc = self.calculate(table, waiter, cooker)
+                            if kazanc < tmpKazanc:
+                                checkList[i] = False
+                                cooker -= 1
+                                waiter -= 1
+                                table -= 1
+                            else:
+                                tmpKazanc = kazanc
+                        else:
+                            tmpKazanc = kazanc
                     else:
                         tmpKazanc = kazanc
                     
