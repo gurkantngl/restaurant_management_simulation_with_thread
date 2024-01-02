@@ -185,10 +185,12 @@ class Cooker():
         self.cookerUI = cookerUI
         self.pixmapBos = pixmapBos
         self.pixmapDolu = pixmapDolu
+        self.counter = 0
         
     def siparis_hazirla(self, customer):
         self.semaphore.acquire()
         try:
+            self.counter += 1
             self.cookerUI.setPixmap(self.pixmapDolu)
             text = f"{self.cooker_no} no'lu aşçı {customer.customer_no} no'lu müşterinin siparişini hazırlıyor\n"
             Prb1Panel.addCookerTable(text)
@@ -199,7 +201,9 @@ class Cooker():
         
         
     def siparis_hazir(self, customer):
-        self.cookerUI.setPixmap(pixmapBos)
+        self.counter -= 1
+        if self.counter == 0:
+            self.cookerUI.setPixmap(pixmapBos)
         text = f"{self.cooker_no} no'lu aşçı {customer.customer_no} no'lu müşterinin siparişini hazırladı\n"
         Prb1Panel.addCookerTable(text)
 
